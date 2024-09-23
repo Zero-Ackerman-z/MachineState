@@ -13,7 +13,7 @@ public class Comer : StateMove
     }
     public override void LoadComponent()
     {
-       stateType = StateType.Comer;
+       //stateType = StateType.Comer;
         base.LoadComponent();
     }
     public override void Enter()

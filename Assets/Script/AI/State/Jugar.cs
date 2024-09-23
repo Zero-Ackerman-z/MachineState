@@ -11,7 +11,7 @@ public class Jugar : StateMove
     }
     public override void LoadComponent()
     {
-        stateType = StateType.Jugar;
+        //stateType = StateType.Jugar;
         base.LoadComponent();
         
     }

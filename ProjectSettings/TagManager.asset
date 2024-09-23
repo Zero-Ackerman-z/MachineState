@@ -3,18 +3,19 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - PLayer
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Obtacle
   - Water
   - UI
-  - 
-  - 
-  - 
-  - 
+  - Allies
+  - Enemys
+  - Toy
+  - Player
   - 
   - 
   - 

@@ -4,8 +4,6 @@ using UnityEngine;
 
 public class Jugando : StateWait
 {
-
-    // Start is called before the first frame update
     void Awake()
     {
         this.LoadComponent();
@@ -18,21 +16,59 @@ public class Jugando : StateWait
     public override void Enter()
     {
         base.Enter();
+        stateNode = StateNode.MoveTo;
         Debug.Log("Jugando Enter ");
     }
     public override void Execute()
     {
         base.Execute();
-        if(!WaitTime)
-        {
-            _MachineState.ActiveState(GetRandomStateType());
-        }
+        GetComponent<TestAIEye>().UpdateScan();
 
-        Debug.Log("Jugando Execute ");
+        Transform detectedToy = GetComponent<TestAIEye>().ScanViewObjs.Find(obj => obj != null)?.transform;
+
+        if (detectedToy != null)
+        {
+            stateNode = StateNode.MoveTo;
+            base.MoveToTarget(detectedToy);
+        }
+        else
+        {
+            switch (stateNode)
+            {
+                case StateNode.MoveTo:
+                    base.MoveToPlace();
+                    float distancia = (transform.position - place.position).magnitude;
+                    if (distancia < 1)
+                    {
+                        stateNode = StateNode.StartStay;
+                    }
+                    break;
+                case StateNode.StartStay:
+                    StartCoroutineWait();
+                    stateNode = StateNode.Stay;
+                    break;
+
+
+                case StateNode.Stay:
+                    WanderAround();
+                    if (!WaitTime)
+                    {
+                        _MachineState.ActiveState(GetRandomStateType());
+                        return;
+                    }
+                    Debug.Log("Jugando Execute ");
+                    break;
+                case StateNode.Finish:
+                    break;
+                default:
+                    break;
+            }
+        }
     }
     public override void Exit()
     {
         base.Exit();
+        stateNode = StateNode.MoveTo;
         Debug.Log("Jugando Exit ");
     }
 }

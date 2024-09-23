@@ -18,21 +18,46 @@ public class Durmiendo : StateWait
     public override void Enter()
     {
         base.Enter();
-        Debug.Log("Jugando Enter ");
+        stateNode = StateNode.MoveTo;
+        Debug.Log("Durmiendo Enter ");
     }
     public override void Execute()
     {
         base.Execute();
-        if (!WaitTime)
-        {
-            _MachineState.ActiveState(GetRandomStateType());
-        }
 
-        Debug.Log("Jugando Execute ");
+
+        switch (stateNode)
+        {
+            case StateNode.MoveTo:
+                base.MoveToPlace();
+                float distancia = (transform.position - place.position).magnitude;
+                if (distancia < 1)
+                {
+                    stateNode = StateNode.StartStay;
+                }
+                break;
+            case StateNode.StartStay:
+                StartCoroutineWait();
+                stateNode = StateNode.Stay;
+                break;
+            case StateNode.Stay:
+                if (!WaitTime)
+                {
+                    _MachineState.ActiveState(GetRandomStateType());
+                    return;
+                }
+                Debug.Log("Durmiendo Execute ");
+                break;
+            case StateNode.Finish:
+                break;
+            default:
+                break;
+        }
     }
     public override void Exit()
     {
         base.Exit();
-        Debug.Log("Jugando Exit ");
+        stateNode = StateNode.MoveTo;
+        Debug.Log("Durmiendo Exit ");
     }
 }

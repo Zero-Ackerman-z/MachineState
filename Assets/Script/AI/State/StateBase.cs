@@ -7,6 +7,7 @@ public class StateBase : MonoBehaviour
 {
     protected MachineState _MachineState;
     public StateType stateType;
+    public StateNode stateNode;
     public virtual void LoadComponent()
     {
         _MachineState = GetComponent<MachineState>();
@@ -25,13 +26,17 @@ public class StateBase : MonoBehaviour
     }
     public StateType GetRandomStateType()
     {
-        // Obtiene todos los valores del enum StateType
         StateType[] values = (StateType[])System.Enum.GetValues(typeof(StateType));
+        List<StateType> possibleValues = new List<StateType>();
 
-        // Elige un índice aleatorio dentro del rango de valores
-        int randomIndex = Random.Range(0, values.Length);
-
-        // Devuelve el valor aleatorio
-        return values[randomIndex];
+        foreach (StateType value in values)
+        {
+            if (value != stateType)
+            {
+                possibleValues.Add(value);
+            }
+        }
+        int randomIndex = Random.Range(0, possibleValues.Count);
+        return possibleValues[randomIndex];
     }
 }

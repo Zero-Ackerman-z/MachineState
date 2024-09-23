@@ -7,6 +7,11 @@ public class SteeringBehavior : MonoBehaviour
 
     // Velocidad máxima del objeto
     public float maxSpeed = 10f;
+    public Transform wanderAreaCenter; // El centro fijo del área de deambulación
+    public float wanderAreaRadius;
+    public float wanderCircleRadius;
+    public float wanderDistance;      
+    public float wanderJitter;        // Cantidad de variación aleatoria en la dirección
 
     // Fuerza máxima de la aceleración
     public float maxForce = 5f;
@@ -15,6 +20,7 @@ public class SteeringBehavior : MonoBehaviour
     public Vector3 velocity;
     // Radio de desaceleración
     public float slowingRadius = 5f;
+    public Vector3[] path; // Camino para Path Following
     private int currentWaypointIndex = 0;
 
     private Vector3 CalculateSteeringForce(Vector3 desired)
@@ -93,40 +99,63 @@ public class SteeringBehavior : MonoBehaviour
     // Wander: deambular aleatoriamente dentro de un radio
     public Vector3 Wander()
     {
-        float wanderRadius = 2f;        // Radio de deambulación
-        float wanderDistance = 5f;      // Distancia desde el centro del círculo de deambulación
-        float wanderJitter = 1f;        // Cantidad de variación aleatoria en la dirección
+        Vector3 center = wanderAreaCenter.position;
 
-        // Desplaza la posición de la dirección actual
-        Vector3 circleCenter = velocity.normalized * wanderDistance;
         Vector3 displacement = new Vector3(
-            Random.Range(-1f, 1f),
-            Random.Range(-1f, 1f),
-            Random.Range(-1f, 1f)
-        ).normalized * wanderRadius * wanderJitter;
+           Random.Range(-1f, 1f) * wanderCircleRadius,
+           0,
+           Random.Range(-1f, 1f) * wanderCircleRadius
+       );
 
-        Vector3 wanderForce = circleCenter + displacement;
-        return Vector3.ClampMagnitude(wanderForce, maxForce);
+        displacement *= wanderJitter;
+
+        // Calcular la posición potencial
+        Vector3 potentialPosition = transform.position + displacement + (velocity.normalized * wanderDistance);
+
+        // Limitar la posición potencial a los límites
+        potentialPosition.x = Mathf.Clamp(potentialPosition.x, center.x - wanderAreaRadius, center.x + wanderAreaRadius);
+        potentialPosition.z = Mathf.Clamp(potentialPosition.z, center.z - wanderAreaRadius, center.z + wanderAreaRadius);
+
+        return Vector3.ClampMagnitude(potentialPosition - transform.position, maxForce);
+    }
+
+
+    void OnDrawGizmos()
+    {
+        Vector3 center = wanderAreaCenter != null ? wanderAreaCenter.position : Vector3.zero;
+
+        float wanderRange = wanderAreaRadius;
+
+        // cubo ( área de deambulación)
+        Gizmos.color = Color.blue;
+        Gizmos.DrawWireCube(center, new Vector3(wanderRange * 2, 5, wanderRange * 2));
+
+        //  círculo  
+        Gizmos.color = Color.red;
+        Vector3 circleCenter = transform.position + velocity.normalized * wanderDistance;
+        Gizmos.DrawWireSphere(circleCenter, wanderCircleRadius);
     }
 
     // Path Following: seguir un camino predefinido de puntos de referencia
-    public Vector3 PathFollowing(Vector3[] path, ref int currentWaypointIndex)
+    public Vector3 PathFollowing(KeyPath keyPath, ref int currentWaypointIndex)
     {
-        if (currentWaypointIndex >= path.Length)
+        Path path = PathManager.instance.GetPath(keyPath);
+
+        if (path == null || path.paths.Count == 0)
             return Vector3.zero;
 
-        Vector3 target = path[currentWaypointIndex];
-        if (Vector3.Distance(transform.position, target) < 1f)
+        if (currentWaypointIndex >= path.paths.Count)
+            return Vector3.zero;
+
+        Transform target = path.paths[currentWaypointIndex];
+        if (Vector3.Distance(transform.position, target.position) < 1f)
         {
             currentWaypointIndex++;
-            if (currentWaypointIndex >= path.Length)
-                currentWaypointIndex = path.Length - 1;
+            if (currentWaypointIndex >= path.paths.Count)
+                currentWaypointIndex = path.paths.Count - 1;
         }
 
-        // Convierte el target a Transform para usar con Seek
-        Transform targetTransform = new GameObject().transform;
-        targetTransform.position = target;
-        return Seek(targetTransform);
+        return Seek(target);
     }
 
     // Obstacle Avoidance: evitar obstáculos en el camino
@@ -178,7 +207,7 @@ public class SteeringBehavior : MonoBehaviour
 
         foreach (Transform neighbor in neighbors)
         {
-            centerOfMass += neighbor.position;
+            centerOfMass += neighbor.position;  
             count++;
         }
 

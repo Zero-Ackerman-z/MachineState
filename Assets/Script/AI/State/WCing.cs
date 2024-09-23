@@ -13,7 +13,7 @@ public class WCing : StateMove
     }
     public override void LoadComponent()
     {
-        stateType = StateType.WCing;
+        //stateType = StateType.WCing;
         base.LoadComponent();
          
     }

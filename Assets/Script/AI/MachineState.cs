@@ -2,7 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using static UnityEditor.VersionControl.Asset;
-public enum StateType { Jugar, Jugando, Dormir, Durmiendo, Comer, Comiendo, WCing, WCingg}
+public enum StateType {  Jugando, Durmiendo, Comiendo, WCingg}
+public enum StateNode { MoveTo, StartStay, Stay, Finish }
+
 public class MachineState : MonoBehaviour
 {
     public List<StateBase> states = new List<StateBase>();
@@ -16,7 +18,8 @@ public class MachineState : MonoBehaviour
             states.Add(item);
 
         DescactivarEstados();
-        currentState = GetComponent<Dormir>();
+        currentState = GetComponent<Jugando>();
+        ChangeState(currentState);
     }
     private void DescactivarEstados()
     {

@@ -11,7 +11,7 @@ public class Dormir : StateMove
     }
     public override void LoadComponent()
     {
-        stateType = StateType.Dormir;
+        //stateType = StateType.Dormir;
         base.LoadComponent();
          
     }
