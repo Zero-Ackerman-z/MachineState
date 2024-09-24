@@ -9,17 +9,17 @@ public class Toy : MonoBehaviour
     {
         Debug.Log("Colisión detectada con: " + other.name);
 
-        if (other.CompareTag("Player")) // Asegúrate de que el tag sea correcto
+        if (other.CompareTag("Player"))
         {
             isColliding = true;
-            StartCoroutine(DestroyAfterDelay(2f)); // Llama a la coroutine para destruir
+            StartCoroutine(DestroyAfterDelay(2f)); 
         }
     }
     private void OnTriggerExit(Collider other)
     {
         if (other.CompareTag("Player"))
         {
-            isColliding = false; // Cambia el estado de colisión a falso al salir
+            isColliding = false; 
         }
     }
     private IEnumerator DestroyAfterDelay(float delay)
@@ -28,15 +28,14 @@ public class Toy : MonoBehaviour
 
         while (elapsed < delay)
         {
-            if (!isColliding) // Si ya no está colisionando, salimos
+            if (!isColliding) 
             {
                 yield break;
             }
             elapsed += Time.deltaTime;
-            yield return null; // Espera un frame
+            yield return null; 
         }
 
-        // Si sigue colisionando después del tiempo de espera, destruye el objeto
         Destroy(gameObject);
     }
 }

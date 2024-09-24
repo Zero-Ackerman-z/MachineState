@@ -5,13 +5,12 @@ public class TestAIEye : AIEyeBase
 {
     public DataView DataViewAttack = new DataView();
     public DataView DataViewFire = new DataView();
-    private StateMove stateMove; // Referencia al estado de movimiento
-    public Transform detectedToy; // Variable para almacenar el juguete detectado
-
+    private StateMove stateMove; 
+    public Transform detectedToy; 
     private void Start()
     {
         LoadComponent();
-        stateMove = GetComponent<StateMove>(); // Obtén la referencia al componente StateMove
+        stateMove = GetComponent<StateMove>(); 
 
     }
     public override void LoadComponent()
@@ -22,18 +21,16 @@ public class TestAIEye : AIEyeBase
     {
         base.UpdateScan();
         detectedToy = null;
-        foreach (var scanObj in ScanViewObjs) // Iterar sobre los objetos detectados
+        foreach (var scanObj in ScanViewObjs) 
         {
             if (scanObj != null)
             {
-                // Mover hacia el objeto detectado
                 stateMove.MoveToTarget(scanObj.transform);
 
-                // Verificar si está a la vista
                 DataViewAttack.IsInSight(scanObj.AimOffset);
                 DataViewFire.IsInSight(scanObj.AimOffset);
                 detectedToy = scanObj.transform;
-                break; // Detener el loop una vez encontrado un objeto válido
+                break; 
             }
         }
     }

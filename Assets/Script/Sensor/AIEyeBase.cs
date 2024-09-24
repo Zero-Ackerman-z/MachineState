@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
 public class AIEyeBase : MonoBehaviour
 {
     protected int count = 0;
@@ -18,8 +17,7 @@ public class AIEyeBase : MonoBehaviour
     public ViewObject _Owner { get; set; }
     public bool IsDrawGizmo = false;
     //public ViewObject ScanViewObj;
-    public List<ViewObject> ScanViewObjs = new List<ViewObject>(); // Cambiado a lista
-
+    public List<ViewObject> ScanViewObjs = new List<ViewObject>(); 
     public virtual void LoadComponent()
     {
         _Owner = GetComponent<ViewObject>();
@@ -47,11 +45,9 @@ public class AIEyeBase : MonoBehaviour
     public virtual void Scan()
     {
         Collider[] colliders = Physics.OverlapSphere(transform.position, mainDataView.Distance, mainDataView.Scanlayers);
-
         count = colliders.Length;
         //ScanViewObj = null;
         ScanViewObjs.Clear();
-
         for (int i = 0; i < count; i++)
         {
             GameObject obj = colliders[i].gameObject;
